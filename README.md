@@ -21,7 +21,9 @@ timelapse-gopro
                than 30 minutes.
                Grab a machine running Python 2 and install python-crontab.
                Connect the machine to gopro's wifi network and run
+               
                                sudo python timelapse-gopro.py
+                               
                and leave the machine running for the duration of the 
                timelapse.
 
