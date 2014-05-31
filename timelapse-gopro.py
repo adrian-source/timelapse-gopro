@@ -1,4 +1,3 @@
-#http://10.5.5.9/bacpac/SH?t=WINDOWS01&p=%00
 
 take_picture_on = [
                 # hour, minute
