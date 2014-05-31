@@ -1,27 +1,56 @@
 
+# author: Adrian Sitterle
+
+# description: 
+#               This script will control a gopro camera to take a picture 
+#               every day at specified time or times. The script works 
+#               by accessing gopro's wifi server commands, that are 
+#               executed by making HTTP GET requests with specific parameters.
+
+# script setup:
+#               Below, find an array take_picture_on and fill it with as 
+#               many hour/minue number pairs as you wish. Make sure they
+#               are in 24-hour format.
+
+# hardware setup:
+#               Turn on gopro and turn on wifi. Plug in charging cable or
+#               a power pack, if you want your timelapse to be longer
+#               than 30 minutes.
+#               Grab a machine running Python 2 and install python-crontab.
+#               Connect the machine to gopro's wifi network and run
+#                               sudo python timelapse-gopro.py
+#               and leave the machine running for the duration of the 
+#               timelapse.
+
+# tested on GoPro Hero 3
+
+# Add hour/minute number pairs, of when you want daily picture or 
+# pictures to be taken
 take_picture_on = [
                 # hour, minute
-                [9, 0],
-                [12, 0],
-                [15, 0]
+	(17, 00),
+	(18, 00)
 ]
 
-url_base = "http://10.5.5.9/"
-url_pass = "&t=XXXXXXXXX"
+# Replace the X's with your gopro's wifi password
+url_pass = "t=XXXXXXXX&"
 
-url_gopro_on    = "bacpac/PW?p=%01"
-url_gopro_off   = "bacpac/PW?p=%00"
-url_shutter_on  = "bacpac/SH?p=%01"
-url_shutter_off = "bacpac/SH?p=%00"
-url_mode_video  = "camera/CM?p=%00"
-url_mode_photo  = "camera/CM?p=%01"
-url_fov_wide    = "camera/FV?p=%00"
-url_fov_med     = "camera/FV?p=%01"
-url_fov_narrow  = "camera/FV?p=%02"
-url_vol_no      = "camera/BS?p=%00"
-url_del_last    = "camera/DL?p=%00"
-url_led_no      = "camera/LB?p=%00"
-url_autooff_no  = "camera/AO?p=%00"
+url_base = "http://10.5.5.9/"
+
+url_gopro_on    = "bacpac/PW?"+url_pass+"p=%01"
+url_gopro_off   = "bacpac/PW?"+url_pass+"p=%00"
+url_shutter_on  = "bacpac/SH?"+url_pass+"p=%01"
+url_shutter_off = "bacpac/SH?"+url_pass+"p=%00"
+url_mode_video  = "camera/CM?"+url_pass+"p=%00"
+url_mode_photo  = "camera/CM?"+url_pass+"p=%01"
+url_fov_wide    = "camera/FV?"+url_pass+"p=%00"
+url_fov_med     = "camera/FV?"+url_pass+"p=%01"
+url_fov_narrow  = "camera/FV?"+url_pass+"p=%02"
+url_vol_no      = "camera/BS?"+url_pass+"p=%00"
+url_del_last    = "camera/DL?"+url_pass+"p=%00"
+url_led_no      = "camera/LB?"+url_pass+"p=%00"
+url_autooff_no  = "camera/AO?"+url_pass+"p=%00"
+url_photres_8M  = "camera/PR?"+url_pass+"p=%00"
 
 from crontab import CronTab
 import urllib2
@@ -30,11 +59,11 @@ import sys
 
 def new_cron(minute, hour, cmd):
 
-        tab = CronTab()
+        tab = CronTab(user=True)
 
         cron_job = tab.new(cmd, comment='from timelapse-gopro.py script')
-        cron_job.minute.on(15)
-        cron_job.hour.on(minute)
+        cron_job.minute.on(minute)
+        cron_job.hour.on(hour)
 
         if cron_job.is_valid() == False:
                 print "problem creating cron job"
@@ -47,36 +76,49 @@ def new_cron(minute, hour, cmd):
 
 def send_cmd(cmd):
         try:
-                result = urllib2.urlopen(url_base+cmd+url_pass).read()
+	print url_base+cmd
+                result = urllib2.urlopen(url_base+cmd).read()
                 print result
+		
         except urllib2.URLError, e:
                 print "Error connecting to camera. "
                 print e.args
 
-        sleep(1)
+	sleep(1)
 
 def gopro_setup():
-        send_cmd(url_gopro_on)
+        gopro_wake()
         send_cmd(url_vol_no)
         send_cmd(url_led_no)
         send_cmd(url_autooff_no)
-
-        send_cmd(url_mode_photo)
-        send_cmd(url_fov_narrow)
-
-def gopro_takepic():
-        send_cmd(url_shutter_on)
+        send_cmd(url_photres_8M)
+        send_cmd(url_gopro_off)
 
 def gopro_sleep():
         send_cmd(url_gopro_off)
 
 def gopro_wake():
         send_cmd(url_gopro_on)
+        sleep(5)  # wait till gopro turns on
+
+def gopro_takepic():
+        gopro_wake()
+        send_cmd(url_mode_photo)
+        sleep(5)  # wait till mode switches
+        send_cmd(url_shutter_on)
+        sleep(5)  # wait till photo is taken
+        gopro_sleep()
 
 
 if len(sys.argv) == 1:
         print "seting up gopro"
         gopro_setup()
+        gopro_sleep()
+	
+        for entry in take_picture_on:
+	print entry
+	new_cron(entry[1], entry[0], "python /Users/adriansitterle/timelapse-gopro.py takepic")
+
 else:
         print "sending command to gopro "+sys.argv[1]
         if sys.argv[1] == "takepic":
@@ -87,4 +129,5 @@ else:
                 gopro_wake()
         elif sys.argv[1] == "setup":
                 gopro_setup()
+
 
