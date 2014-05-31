@@ -8,7 +8,7 @@ take_picture_on = [
 ]
 
 url_base = "http://10.5.5.9/"
-url_pass = "&t=WINDOWS01"
+url_pass = "&t=XXXXXXXXX"
 
 url_gopro_on    = "bacpac/PW?p=%01"
 url_gopro_off   = "bacpac/PW?p=%00"
