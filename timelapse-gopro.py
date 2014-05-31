@@ -24,6 +24,8 @@
 
 # tested on GoPro Hero 3
 
+# ========= UPDATE VARIABLES BELOW THIS LINE ===============
+
 # Add hour/minute number pairs, of when you want daily picture or 
 # pictures to be taken
 take_picture_on = [
@@ -32,8 +34,14 @@ take_picture_on = [
 	(18, 00)
 ]
 
+# Update this path with an absolute path to this python file.
+# This will be used to generate the cron job.
+path = "/Users/adriansitterle/timelapse-gopro.py"
+
 # Replace the X's with your gopro's wifi password
 url_pass = "t=XXXXXXXX&"
+
+# ========= UPDATE VARIABLES ABOVE THIS LINE ===============
 
 url_base = "http://10.5.5.9/"
 
@@ -117,7 +125,7 @@ if len(sys.argv) == 1:
 	
         for entry in take_picture_on:
 	print entry
-	new_cron(entry[1], entry[0], "python /Users/adriansitterle/timelapse-gopro.py takepic")
+	new_cron(entry[1], entry[0], "python "+path+" takepic")
 
 else:
         print "sending command to gopro "+sys.argv[1]
