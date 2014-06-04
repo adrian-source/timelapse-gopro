@@ -26,13 +26,12 @@
 
 # ========= UPDATE VARIABLES BELOW THIS LINE ===============
 
-# Add hour/minute number pairs, of when you want daily picture or 
-# pictures to be taken
-take_picture_on = [
-                # hour, minute
-	(17, 00),
-	(18, 00)
-]
+# take a picture, every x minutes
+every_x_minutes = 60;
+
+# between hours of x and y
+between_hour_x = 9;
+between_hour_y = 3;
 
 # Update this path with an absolute path to this python file.
 # This will be used to generate the cron job.
@@ -65,7 +64,8 @@ import urllib2
 from time import sleep
 import sys
 
-def new_cron(minute, hour, cmd):
+# create a daily job for a specific time
+def new_cron_specifictime(minute, hour, cmd):
 
         tab = CronTab(user=True)
 
@@ -81,10 +81,26 @@ def new_cron(minute, hour, cmd):
         tab.write()
         print tab.render()
 
+def new_cron_between(hour_start, hour_end, repeat_every, cmd)
+
+	tab = CronTab(user=True)
+
+	cron_job = tab.new(cmd, comment='from timelapse-gopro.py script')
+	cron_job.hour.between(hour_start, hour_end)
+	cron_job.hour.every(repeat_every) 
+
+        if cron_job.is_valid() == False:
+                print "problem creating cron job"
+                print tab.render()
+                exit()
+
+        tab.write()	
+        print tab.render()
+	
 
 def send_cmd(cmd):
         try:
-	print url_base+cmd
+		print url_base+cmd
                 result = urllib2.urlopen(url_base+cmd).read()
                 print result
 		
@@ -95,7 +111,7 @@ def send_cmd(cmd):
 	sleep(1)
 
 def gopro_setup():
-        gopro_wake()
+	gopro_wake()
         send_cmd(url_vol_no)
         send_cmd(url_led_no)
         send_cmd(url_autooff_no)
@@ -107,26 +123,29 @@ def gopro_sleep():
 
 def gopro_wake():
         send_cmd(url_gopro_on)
-        sleep(5)  # wait till gopro turns on
+        sleep(5) 	# wait till gopro wakes up
 
 def gopro_takepic():
-        gopro_wake()
+	gopro_wake()
         send_cmd(url_mode_photo)
-        sleep(5)  # wait till mode switches
+	sleep(5)	# wait for photo mode to turn on
         send_cmd(url_shutter_on)
-        sleep(5)  # wait till photo is taken
-        gopro_sleep()
+	sleep(5)	# wait for photo to be taken
+	gopro_sleep()
 
 
 if len(sys.argv) == 1:
         print "seting up gopro"
         gopro_setup()
-        gopro_sleep()
+	gopro_sleep()
 	
-        for entry in take_picture_on:
-	print entry
-	new_cron(entry[1], entry[0], "python "+path+" takepic")
-
+	new_cron_between(entry[0], entry[1], entry[2], "python "+path+" takepic")
+	
+	'''
+	for entry in take_picture_on:
+		print entry
+		new_cron_specifictime(entry[1], entry[0], "python "+path+" takepic")
+	'''
 else:
         print "sending command to gopro "+sys.argv[1]
         if sys.argv[1] == "takepic":
