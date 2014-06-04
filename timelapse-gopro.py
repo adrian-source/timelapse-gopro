@@ -34,7 +34,7 @@ between_hour_y = 9;
 
 # Update this path with an absolute path to this python file.
 # This will be used to generate the cron job.
-path = "/Users/adriansitterle/timelapse-gopro.py"
+path = "/PATH_TO_YOUR_FILE/timelapse-gopro.py"
 
 # Replace the X's with your gopro's wifi password
 url_pass = "t=XXXXXXXXX&"
