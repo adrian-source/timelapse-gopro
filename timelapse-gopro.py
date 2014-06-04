@@ -27,18 +27,18 @@
 # ========= UPDATE VARIABLES BELOW THIS LINE ===============
 
 # take a picture, every x minutes
-every_x_minutes = 60;
+every_z_minutes = 120;
 
 # between hours of x and y
-between_hour_x = 9;
-between_hour_y = 3;
+between_hour_x = 3;
+between_hour_y = 9;
 
 # Update this path with an absolute path to this python file.
 # This will be used to generate the cron job.
 path = "/Users/adriansitterle/timelapse-gopro.py"
 
 # Replace the X's with your gopro's wifi password
-url_pass = "t=XXXXXXXX&"
+url_pass = "t=XXXXXXXXX&"
 
 # ========= UPDATE VARIABLES ABOVE THIS LINE ===============
 
@@ -86,8 +86,7 @@ def new_cron_between(hour_start, hour_end, repeat_every, cmd):
 	tab = CronTab(user=True)
 
 	cron_job = tab.new(cmd, comment='from timelapse-gopro.py script')
-	cron_job.hour.between(hour_start, hour_end)
-	cron_job.hour.every(repeat_every) 
+	cron_job.hour.during(hour_start, hour_end).every(repeat_every)
 
         if cron_job.is_valid() == False:
                 print "problem creating cron job"
@@ -115,7 +114,7 @@ def gopro_setup():
         send_cmd(url_vol_no)
         send_cmd(url_led_no)
         send_cmd(url_autooff_no)
-        send_cmd(url_photres_8M)
+        #send_cmd(url_photres_8M)
         send_cmd(url_gopro_off)
 
 def gopro_sleep():
@@ -139,7 +138,7 @@ if len(sys.argv) == 1:
         gopro_setup()
 	gopro_sleep()
 	
-	new_cron_between(entry[0], entry[1], entry[2], "python "+path+" takepic")
+	new_cron_between(between_hour_x, between_hour_y, every_z_minutes, "python "+path+" takepic")
 	
 	'''
 	for entry in take_picture_on:
