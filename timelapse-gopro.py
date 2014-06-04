@@ -81,7 +81,7 @@ def new_cron_specifictime(minute, hour, cmd):
         tab.write()
         print tab.render()
 
-def new_cron_between(hour_start, hour_end, repeat_every, cmd)
+def new_cron_between(hour_start, hour_end, repeat_every, cmd):
 
 	tab = CronTab(user=True)
 
