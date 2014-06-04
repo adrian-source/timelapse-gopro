@@ -8,8 +8,7 @@
 #               executed by making HTTP GET requests with specific parameters.
 
 # script setup:
-#               Below, find an array take_picture_on and fill it with as 
-#               many hour/minue number pairs as you wish. Make sure they
+#               Fill out the time constraints. Make sure they
 #               are in 24-hour format.
 
 # hardware setup:
