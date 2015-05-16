@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# replace the numbers in bracktets to define the rango of photos to download
+# replace the numbers in bracktets to define the range of photos to download
 
 #python timelapse-gopro.py wake
 
